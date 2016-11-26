@@ -81,13 +81,12 @@ case "$1" in
         echo "Starting build graph"
         cd "$dir"
         if [ -z "$user" ]; then
-            java -Xmx2G -jar $cmd --basePath $dir --build $dir/graphs >> "$stdout_log" 2>> "$stderr_log" &
+            java -Xmx2G -jar "$cmd" --basePath "$dir" --build $dir/graphs
         else
-            sudo -u "$user" java -Xmx2G -jar $cmd --basePath $dir --build $dir/graphs >> "$stdout_log" 2>> "$stderr_log" &
+            sudo -u "$user" java -Xmx2G -jar "$cmd" --basePath "$dir" --build $dir/graphs
         fi
         echo $! > "$build_pid_file"
         if ! is_running "$build_pid_file"; then
-            echo "Unable to start, see $stdout_log and $stderr_log"
             exit 1
         fi
     fi
