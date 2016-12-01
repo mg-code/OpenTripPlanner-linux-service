@@ -15,7 +15,6 @@ cmd="otp-1.0.0-shaded.jar"
 
 name=`basename $0`
 pid_file="/var/run/$name.pid"
-build_pid_file="/var/run/$name_build.pid"
 stdout_log="/var/log/$name.log"
 stderr_log="/var/log/$name.err"
 
@@ -75,21 +74,14 @@ case "$1" in
     fi
     ;;
     build)
-    if is_running "$build_pid_file"; then
-        echo "Already started"
+    echo "Starting build graph"
+    cd "$dir"
+    if [ -z "$user" ]; then
+        java -Xmx2G -jar "$cmd" --basePath "$dir" --build $dir/graphs
     else
-        echo "Starting build graph"
-        cd "$dir"
-        if [ -z "$user" ]; then
-            java -Xmx2G -jar "$cmd" --basePath "$dir" --build $dir/graphs
-        else
-            sudo -u "$user" java -Xmx2G -jar "$cmd" --basePath "$dir" --build $dir/graphs
-        fi
-        echo $! > "$build_pid_file"
-        if ! is_running "$build_pid_file"; then
-            exit 1
-        fi
+        sudo -u "$user" java -Xmx2G -jar "$cmd" --basePath "$dir" --build $dir/graphs
     fi
+    exit 0
     ;;
     restart)
     $0 stop
